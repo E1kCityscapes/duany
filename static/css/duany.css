@@ -12,6 +12,14 @@
   margin-left: 0;
 }
 
+.duany-sstripe {
+  border: none;
+  height: 1em;
+  width: 8em;
+  background: black;
+  margin-left: 0;
+}
+
 .duany-title {
   font-size: 6em;
 }
@@ -22,6 +30,16 @@
 
 .duany-description {
   font-size: 1.8em;
+}
+
+.duany-subheader {
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 1.2em;
+}
+
+.duany-subdescription {
+  font-size: 1.6em;
 }
 
 .duany-unitcards.ui.cards>.card {
