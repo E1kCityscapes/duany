@@ -93,8 +93,6 @@
   </div>
 
   <script>
-    
-
     //bluetooth stuff
     const gattService_cityscape = 0xCC00;
     const gattChar_boardSState = 0xCC01;
@@ -145,7 +143,7 @@
         });
 
     });
-    
+
     //bluetooth ui stuff
     $('#connectDimmer')
       .dimmer('setting', 'closable', false)
@@ -168,9 +166,9 @@
     const TRANSIT_BASE = 0x40;
 
     const TRANSIT_BUS_STOP = 0x00;
-    
+
     var types = {};
-    
+
     types[POWER_BASE + POWER_SOLAR] = {
       category: "power",
       subtype: "solar"
@@ -183,7 +181,7 @@
       category: "power",
       subtype: "coal"
     };
-    
+
     types[BUILDING_BASE + BUILDING_HOUSE_SMALL] = {
       category: "building",
       subtype: "house_small"
@@ -200,12 +198,12 @@
       category: "building",
       subtype: "apt_large"
     };
-    
+
     types[TRANSIT_BASE + TRANSIT_BUS_STOP] = {
       category: "transit",
       subtype: "busStop"
     };
-    
+
     var boardInitialized = false;
     var powerState = [];
     var buildingState = [];
@@ -232,30 +230,59 @@
       }
 
       boardInitialized = true;
-      
+
       $('#connectDimmer').dimmer('hide'); //TODO dirty ui stuff
     }
 
     function handleOnSStateNotify(event) {
       //            console.log(event);
       var value = event.target.value;
-      var flags = value.getUint8(0).toString(16)
-      var updateNum = value.getUint8(1).toString(16);
-      var rawType = value.getUint8(2) & 0B01111111).toString(16);
+      var flags = value.getUint8(0);
+      var updateNum = value.getUint8(1);
+      var rawType = value.getUint8(2) & 0B01111111;
       var state = Boolean(value.getUint8(2) & 0B10000000);
-      var id = value.getUint8(3).toString(16);
-      var level = value.getUint8(4).toString(16);
-      console.log('Flags is ' + flags);
+      var id = value.getUint8(3);
+      var level = value.getUint8(4);
+      console.log('Flags is ' + flags.toString(16));
       console.log('UpdateNum is ' + updateNum);
-      console.log('Type is ' + rawType);
-      console.log('State is ' + state);
-      console.log('Id is ' + id);
-      console.log('Level is ' + level);
+      console.log('Type is ' + rawType.toString(16));
+      console.log('State is ' + state.toString(16));
+      console.log('Id is ' + id.toString(16));
+      console.log('Level is ' + level.toString(16));
       console.log(buf2hex(value.buffer));
-      
+
       var type = types[rawType];
-      
+
       console.log(type);
+
+      switch (type.category) {
+        case "power":
+          handlePowerUpdate(type, id, state, level);
+          break;
+        case "building":
+          handleBuildingUpdate(type, id, state);
+          break;
+        case "transit":
+          handleTransitUpdate(type, id, state);
+          break;
+      }
+
+    }
+
+    function handlePowerUpdate(type, id, state, level) {
+      powerState[id].state = state;
+      powerState[id].level = level;
+      powerState[id].subtype = type.subtype;
+    }
+
+    function handleBuildingUpdate(type, id, state) {
+      buildingState[id].state = state;
+      buildingState[id].subtype = type.subtype;
+    }
+
+    function handleTransitUpdate(type, id, state) {
+      transitState[id].state = state;
+      transitState[id].subtype = type.subtype;
     }
 
     function buf2hex(buffer) { // buffer is an ArrayBuffer
