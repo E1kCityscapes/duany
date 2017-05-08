@@ -32,6 +32,23 @@
   font-size: 1.8em;
 }
 
+.duany-subdescription {
+  font-size: 1.6em;
+  color: grey;
+}
+
+.duany-unit{
+  font-weight: 800;
+}
+
+.duany-unit.blue{
+  color: #2185d0;
+}
+
+.duany-unit.violet{
+  color: #6435c9;
+}
+
 .duany-subheader {
   text-transform: uppercase;
   font-weight: 800;
@@ -91,4 +108,8 @@
 
 .duany-unitcards.ui.cards>.duany-parks-unit.card {
   background-image: url("../img/Parks.png");
+}
+
+.hidden {
+  display: none !important;
 }

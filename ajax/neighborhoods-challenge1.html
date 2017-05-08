@@ -1,0 +1,58 @@
+<nav class="ui fixed inverted menu">
+  <a id="back" class="item">
+    <i class="angle left icon"></i>
+  </a>
+<!--  <div class="ui container duany-container">-->
+    <a href="#" class="header item">
+      1. Neighborhoods
+    </a>
+    <a href="#" class="item active">
+      I. Arithmetic
+    </a>
+    <a href="#" class="item">
+      II. Order of Operations
+    </a>
+<!--  </div>-->
+</nav>
+<div class="duany-coverblock">
+  <div class="ui grid">
+    <div class="row">
+      <div class="duany-sectionblock twelve wide column">
+        <hr class="duany-sstripe">
+        <h2 class="duany-header">Moving in, part I</h2>
+        <p class="duany-description">Let's start building.</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="duany-sectionblock twelve wide column">
+        <p class="duany-description">
+          <span class="ui basic violet huge label">
+            <i class="building icon"></i> 1 small apartment
+          </span> can hold
+          <span class="ui basic blue huge label">
+            <i class="users icon"></i> 10 families
+          </span>.</p>
+        <p class="duany-description">
+          <span class="ui basic blue huge label">
+            80 families
+          </span> are moving into the city. How many <span class="ui basic violet huge label">
+            small apartments
+          </span> does the city need to build?</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="duany-sectionblock sixteen wide column">
+      <button id="next" class="ui teal button">Next</button>
+      </div>
+    </div>
+  </div>
+  
+</div>
+<script>
+  $("#back").click(function() {
+      $("#dyncontent").load("ajax/menu.html");
+    })
+  $("#next").click(function() {
+      $("#dyncontent").load("ajax/neighborhoods-challenge2.html");
+    })
+</script>

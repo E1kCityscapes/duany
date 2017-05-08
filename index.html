@@ -10,86 +10,26 @@
 <body>
   <div id="connectDimmer" class="ui page dimmer">
     <div class="content">
-      <div class="center">
-        <button id="connect" class="ui button">
+      <div class="ui container">
+        <div class="row"><h2 class="ui inverted icon header">
+          <i class="bluetooth icon"></i>
+        </h2>
+        </div>
+        <div class="ui container">
+          <button id="connect" class="ui blue button">
           Connect to Board
         </button>
+        <button id="explore" class="ui button">
+          Explore
+        </button>
+        </div>
+        
+        
       </div>
 
     </div>
   </div>
   <div id="dyncontent">
-    <div class="duany-coverblock">
-      <div class="ui two column grid">
-        <div class="duany-headerblock column">
-          <hr class="duany-hstripe">
-          <h1 class="duany-title">Welcome to the City</h1>
-        </div>
-      </div>
-
-      <div class="ui three cards duany-unitcards">
-        <a class="card duany-neighborhoods-unit">
-          <div class="image">
-            <img>
-          </div>
-          <div class="content">
-            <div class="header">
-              1. <br> Neighborhoods
-            </div>
-          </div>
-        </a>
-        <div class="card duany-power-unit">
-          <div class="image">
-            <img>
-          </div>
-          <div class="content">
-            <div class="header">
-              2. <br> Power + Electricity
-            </div>
-          </div>
-        </div>
-        <div class="card duany-growth-unit">
-          <div class="image">
-            <img>
-          </div>
-          <div class="content">
-            <div class="header">
-              3. <br> Growth
-            </div>
-          </div>
-        </div>
-        <div class="card duany-transportation-unit">
-          <div class="image">
-            <img>
-          </div>
-          <div class="content">
-            <div class="header">
-              4. <br> Transportation
-            </div>
-          </div>
-        </div>
-        <div class="card duany-town-center-unit">
-          <div class="image">
-            <img>
-          </div>
-          <div class="content">
-            <div class="header">
-              5. <br> Town Center
-            </div>
-          </div>
-        </div>
-        <div class="card duany-parks-unit">
-          <div class="image">
-            <img>
-          </div>
-          <div class="content">
-            <div class="header">
-              6. <br> Parks
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <script>
@@ -97,6 +37,10 @@
     const gattService_cityscape = 0xCC00;
     const gattChar_boardSState = 0xCC01;
     const gattChar_boardInfo = 0xCC05;
+    var expButton = document.getElementById("explore");
+    expButton.addEventListener('pointerup', function(event) {
+       $('#connectDimmer').dimmer('hide');
+    });
     var connectButton = document.getElementById("connect");
     connectButton.addEventListener('pointerup', function(event) {
       var servicePromise = navigator.bluetooth.requestDevice({
@@ -149,7 +93,7 @@
     //bluetooth ui stuff
     $('#connectDimmer')
       .dimmer({
-          closable: false  
+        closable: false
       })
       .dimmer('show');
 
@@ -270,7 +214,7 @@
           handleTransitUpdate(type, id, state);
           break;
       }
-
+      document.dispatchEvent(stateUpdateEvent);
     }
 
     function handlePowerUpdate(type, id, state, level) {
@@ -289,14 +233,33 @@
       transitState[id].subtype = type.subtype;
     }
 
+    //events
+    var stateUpdateEvent = new Event('stateUpdate', {
+      'detail': {
+        powerState: powerState,
+        buildingState: buildingState,
+        transitState: transitState
+      }
+    });
+
+    function countActive(state) {
+      var numActive = 0;
+      var stateLength = state.length;
+      for (i = 0; i < stateLength; i++) {
+        if (state[i].state) {
+          numActive++;
+        }
+      }
+      return numActive;
+    }
+
+
     function buf2hex(buffer) { // buffer is an ArrayBuffer
       return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('-');
     }
 
     //evil jquery
-    $(".duany-neighborhoods-unit").click(function() {
-      $("#dyncontent").load("neighborhoods-demo.html");
-    })
+    $("#dyncontent").load("ajax/menu.html");
 
   </script>
 </body>

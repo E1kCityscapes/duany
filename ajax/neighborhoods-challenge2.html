@@ -1,0 +1,106 @@
+<nav class="ui fixed inverted menu">
+  <a id="back" class="item">
+    <i class="angle left icon"></i>
+  </a>
+  <!--  <div class="ui container duany-container">-->
+  <a href="#" class="header item">
+      1. Neighborhoods
+    </a>
+  <a href="#" class="item active">
+      I. Arithmetic
+    </a>
+  <a href="#" class="item">
+      II. Order of Operations
+    </a>
+  <!--  </div>-->
+</nav>
+<div class="duany-coverblock">
+  <div class="ui grid">
+    <div class="row">
+      <div class="duany-sectionblock twelve wide column">
+        <hr class="duany-sstripe">
+        <h2 class="duany-header">Moving in, part II</h2>
+        <p class="duany-description">Let's start building.</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="duany-sectionblock twelve wide column">
+        <p class="duany-description">
+          <span class="ui basic violet duany-unit">
+            <i class="building icon"></i> 1 small apartment
+          </span> can hold
+          <span class="ui basic blue duany-unit">
+            <i class="users icon"></i> 10 families
+          </span>.</p>
+        <p class="duany-description">
+          <span class="ui basic blue duany-unit">
+            80 families
+          </span> are moving into the city. How many <span class="ui basic violet duany-unit">
+            small apartments
+          </span> does the city need to build?</p>
+      </div>
+    </div>
+    <div id="progressrow" class="row">
+      <div class="duany-sectionblock twelve wide column">
+        <p class="duany-subdescription">
+          <!--
+            Place enough <span class="ui basic violet duany-unit">
+            small apartments
+          </span> on the board to fit <span class="ui basic blue duany-unit">
+            40 families:
+          </span>
+-->
+        </p>
+        <p class="duany-description">
+          <span class="ui basic violet duany-unit">
+            <i class="building icon"></i> <span id="board-buildings">0</span> small apartments
+          </span>
+          placed.
+
+          
+          Your city will fit 
+          <span class="ui basic blue duany-unit">
+            <span id="board-families">0</span> families
+          </span>
+
+      </div>
+    </div>
+    <div id="nextrow" class="row hidden">
+      
+      
+      <div class="duany-sectionblock sixteen wide column">
+        <p class="duany-description">
+        Nice job! <span class="ui basic violet duany-unit">
+            <i class="building icon"></i> 4 small apartments 
+          </span> will fit <span class="ui basic blue duany-unit">
+            40 families</span>!
+      </p>
+        <button id="next" class="ui teal button">Next</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+  $("#back").click(function() {
+    $("#dyncontent").load("ajax/menu.html");
+  })
+  document.addEventListener('stateUpdate', function(event) {
+    //    console.log('stateupdate', event.detail)
+    console.log(buildingState);
+    var numBuildings = countActive(buildingState);
+
+    console.log(numBuildings);
+    document.getElementById("board-buildings").innerHTML = numBuildings;
+    document.getElementById("board-families").innerHTML = (parseFloat(numBuildings) * 10);
+
+    if ((parseFloat(numBuildings) * 10) == 40) {
+      $("#progressrow").addClass("hidden");
+      $("#nextrow").removeClass("hidden");
+      $("#next").click(function() {
+        $("#dyncontent").load("ajax/neighborhoods-challenge3.html");
+      })
+    }
+  }, false)
+
+</script>

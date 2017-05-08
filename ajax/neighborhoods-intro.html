@@ -1,0 +1,53 @@
+<nav class="ui fixed inverted menu">
+  <a id="back" class="item">
+    <i class="angle left icon"></i>
+  </a>
+<!--  <div class="ui container duany-container">-->
+    <a href="#" class="header item">
+      1. Neighborhoods
+    </a>
+    <a href="#" class="item active">
+      I. Arithmetic
+    </a>
+    <a href="#" class="item">
+      II. Order of Operations
+    </a>
+<!--  </div>-->
+</nav>
+<div class="duany-coverblock">
+  <div class="ui grid">
+    <div class="row">
+      <div class="duany-sectionblock twelve wide column">
+        <hr class="duany-sstripe">
+        <h2 class="duany-header">Integers</h2>
+        <p class="duany-description">Whole positive and negative numbers, including zero.</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="duany-sectionblock twelve wide column">
+        <h4 class="duany-subheader">Examples:</h4>
+        <p class="duany-subdescription">1 house</p>
+        <p class="duany-graphics"><i class="building icon"></i></p>
+        <p class="duany-subdescription">5 houses</p>
+        <p class="duany-graphics"><i class="building icon"></i><i class="building icon"></i><i class="building icon"></i><i class="building icon"></i><i class="building icon"></i></p>
+        <p class="duany-subdescription">-5 houses</p>
+        <p class="duany-graphics"><i class="building outline icon"></i><i class="building outline icon"></i><i class="building outline icon"></i><i class="building outline icon"></i><i class="building outline icon"></i></p>
+        <p class="duany-subdescription">0 houses</p>
+        <p class="duany-graphics"></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="duany-sectionblock sixteen wide column">
+      <button id="next" class="ui grey button">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $("#back").click(function() {
+      $("#dyncontent").load("ajax/menu.html");
+    })
+  $("#next").click(function() {
+      $("#dyncontent").load("ajax/neighborhoods-challenge2.html");
+    })
+</script>
