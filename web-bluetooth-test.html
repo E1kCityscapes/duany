@@ -1,0 +1,63 @@
+<meta content='width=device-width, initial-scale=.8, maximum-scale=.8, user-scalable=0' name='viewport' />
+
+<head>
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="static/css/duany.css">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+    <script src="semantic/dist/semantic.min.js"></script>
+</head>
+
+<body>
+    <button id="connect" class="ui button">
+      Connect
+    </button>
+
+    <script>
+        const gattService_cityscape = 0xCC00;
+        const gattChar_boardSState = 0xCC01;
+        var connectButton = document.getElementById("connect");
+        connectButton.addEventListener('pointerup', function(event) {
+            navigator.bluetooth.requestDevice({
+                    filters: [{
+                        name: 'Cityscape Board',
+                        services: [gattService_cityscape]
+                    }]
+                })
+                .then(device => device.gatt.connect())
+                .then(server => {
+                    // Getting Battery Service...
+                    return server.getPrimaryService(gattService_cityscape);
+                })
+                .then(service => {
+                    // Getting Battery Level Characteristic...
+                    return service.getCharacteristic(gattChar_boardSState);
+                })
+                .then(characteristic => {
+                    characteristic.addEventListener('characteristicvaluechanged',
+                                  handleOnSStateNotify);
+                    characteristic.startNotifications();
+//                    console.log(characteristic);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        });
+        
+        function handleOnSStateNotify(event) {
+//            console.log(event);
+            var value = event.target.value;
+            console.log('Flags is ' + value.getUint8(0).toString(16));
+            console.log('UpdateNum is ' + value.getUint8(1).toString(16));
+            console.log('Type is ' + (value.getUint8(2) & 0B01111111).toString(16));
+            console.log('State is ' + Boolean(value.getUint8(2) & 0B10000000));
+            console.log('Id is ' + value.getUint8(3).toString(16));
+            console.log('Level is ' + value.getUint8(4).toString(16));
+            console.log(buf2hex(value.buffer));
+        }
+        
+        function buf2hex(buffer) { // buffer is an ArrayBuffer
+          return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('-');
+        }
+
+    </script>
+</body>
