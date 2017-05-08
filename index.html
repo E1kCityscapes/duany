@@ -146,7 +146,9 @@
 
     //bluetooth ui stuff
     $('#connectDimmer')
-      .dimmer('setting', 'closable', false)
+      .dimmer({
+          closable: false  
+      })
       .dimmer('show');
 
     //board state
