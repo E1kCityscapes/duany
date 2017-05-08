@@ -1,4 +1,5 @@
 <meta content='width=device-width, initial-scale=.8, maximum-scale=.8, user-scalable=0' name='viewport' />
+
 <head>
   <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
   <link rel="stylesheet" type="text/css" href="static/css/duany.css">
@@ -7,75 +8,200 @@
 </head>
 
 <body>
-  <div class="duany-coverblock">
-    <div class="ui two column grid">
-      <div class="duany-headerblock column">
-        <hr class="duany-hstripe">
-        <h1 class="duany-title">Welcome to the City</h1>
+  <div id="connectDimmer" class="ui page dimmer">
+    <div class="content">
+      <div class="center">
+        <button id="connect" class="ui button">
+          Connect to Board
+        </button>
       </div>
+
     </div>
-    
-    <div class="ui three cards duany-unitcards">
-      <a class="card duany-neighborhoods-unit" href="neighborhoods-demo.html">
-        <div class="image">
-          <img>
-        </div>
-        <div class="content">
-          <div class="header">
-            1. <br> Neighborhoods
-          </div>
-        </div>
-      </a>
-      <div class="card duany-power-unit">
-        <div class="image">
-          <img>
-        </div>
-        <div class="content">
-          <div class="header">
-            2. <br> Power + Electricity
-          </div>
+  </div>
+  <div id="dyncontent">
+    <div class="duany-coverblock">
+      <div class="ui two column grid">
+        <div class="duany-headerblock column">
+          <hr class="duany-hstripe">
+          <h1 class="duany-title">Welcome to the City</h1>
         </div>
       </div>
-      <div class="card duany-growth-unit">
-        <div class="image">
-          <img>
-        </div>
-        <div class="content">
-          <div class="header">
-            3. <br> Growth
+
+      <div class="ui three cards duany-unitcards">
+        <a class="card duany-neighborhoods-unit">
+          <div class="image">
+            <img>
+          </div>
+          <div class="content">
+            <div class="header">
+              1. <br> Neighborhoods
+            </div>
+          </div>
+        </a>
+        <div class="card duany-power-unit">
+          <div class="image">
+            <img>
+          </div>
+          <div class="content">
+            <div class="header">
+              2. <br> Power + Electricity
+            </div>
           </div>
         </div>
-      </div>
-      <div class="card duany-transportation-unit">
-        <div class="image">
-          <img>
-        </div>
-        <div class="content">
-          <div class="header">
-            4. <br> Transportation
+        <div class="card duany-growth-unit">
+          <div class="image">
+            <img>
+          </div>
+          <div class="content">
+            <div class="header">
+              3. <br> Growth
+            </div>
           </div>
         </div>
-      </div>
-      <div class="card duany-town-center-unit">
-        <div class="image">
-          <img>
-        </div>
-        <div class="content">
-          <div class="header">
-            5. <br> Town Center
+        <div class="card duany-transportation-unit">
+          <div class="image">
+            <img>
+          </div>
+          <div class="content">
+            <div class="header">
+              4. <br> Transportation
+            </div>
           </div>
         </div>
-      </div>
-      <div class="card duany-parks-unit">
-        <div class="image">
-          <img>
+        <div class="card duany-town-center-unit">
+          <div class="image">
+            <img>
+          </div>
+          <div class="content">
+            <div class="header">
+              5. <br> Town Center
+            </div>
+          </div>
         </div>
-        <div class="content">
-          <div class="header">
-            6. <br> Parks
+        <div class="card duany-parks-unit">
+          <div class="image">
+            <img>
+          </div>
+          <div class="content">
+            <div class="header">
+              6. <br> Parks
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <script>
+    
+
+    //bluetooth stuff
+    const gattService_cityscape = 0xCC00;
+    const gattChar_boardSState = 0xCC01;
+    const gattChar_boardInfo = 0xCC05;
+    var connectButton = document.getElementById("connect");
+    connectButton.addEventListener('pointerup', function(event) {
+      var servicePromise = navigator.bluetooth.requestDevice({
+          filters: [{
+            name: 'Cityscape Board',
+            services: [gattService_cityscape]
+          }]
+        })
+        .then(device => device.gatt.connect())
+        .then(server => {
+          // Getting Cityscape Service...
+          return server.getPrimaryService(gattService_cityscape);
+        });
+
+      // Getting Board Info Characteristic
+      var boardInitializedPromise = servicePromise.then(service => {
+          return service.getCharacteristic(gattChar_boardInfo);
+        })
+        .then(characteristic => {
+          return characteristic.readValue();
+        })
+        .then(value => {
+          console.log('Number of Power Plant Pins: ' + value.getUint8(0));
+          console.log('Number of Building Pins: ' + value.getUint8(1));
+          console.log('Number of Transit Pins: ' + value.getUint8(2));
+          initializeBoardState(value.getUint8(0), value.getUint8(1), value.getUint8(02));
+        })
+        .catch(error => {
+          console.log(error);
+        });
+
+      // Getting Board State Characteristic
+      servicePromise.then(service => {
+          return service.getCharacteristic(gattChar_boardSState);
+        })
+        .then(characteristic => {
+          characteristic.addEventListener('characteristicvaluechanged',
+            handleOnSStateNotify);
+          characteristic.startNotifications();
+          //                    console.log(characteristic);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+
+    });
+    
+    //bluetooth ui stuff
+    $('#connectDimmer')
+      .dimmer('setting', 'closable', false)
+      .dimmer('show');
+
+    //board state
+    var boardInitialized = false;
+    var powerState = [];
+    var buildingState = [];
+    var transitState = [];
+
+    function initializeBoardState(numPowerPins, numBuildingPins, numTransitPins) {
+      for (var i = 0; i < numPowerPins; i++) {
+        powerState.push({
+          state: false,
+          level: 255
+        });
+      }
+
+      for (var i = 0; i < numBuildingPins; i++) {
+        buildingState.push({
+          state: false
+        });
+      }
+
+      for (var i = 0; i < numTransitPins; i++) {
+        transitState.push({
+          state: false
+        });
+      }
+
+      boardInitialized = true;
+      
+      $('#connectDimmer').dimmer('hide'); //TODO dirty ui stuff
+    }
+
+    function handleOnSStateNotify(event) {
+      //            console.log(event);
+      var value = event.target.value;
+      console.log('Flags is ' + value.getUint8(0).toString(16));
+      console.log('UpdateNum is ' + value.getUint8(1).toString(16));
+      console.log('Type is ' + (value.getUint8(2) & 0B01111111).toString(16));
+      console.log('State is ' + Boolean(value.getUint8(2) & 0B10000000));
+      console.log('Id is ' + value.getUint8(3).toString(16));
+      console.log('Level is ' + value.getUint8(4).toString(16));
+      console.log(buf2hex(value.buffer));
+    }
+
+    function buf2hex(buffer) { // buffer is an ArrayBuffer
+      return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('-');
+    }
+
+    //evil jquery
+    $(".duany-neighborhoods-unit").click(function() {
+      $("#dyncontent").load("neighborhoods-demo.html");
+    })
+
+  </script>
 </body>
