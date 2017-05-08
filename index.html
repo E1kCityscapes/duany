@@ -152,6 +152,60 @@
       .dimmer('show');
 
     //board state
+    const POWER_BASE = 0x00;
+
+    const POWER_SOLAR = 0x00;
+    const POWER_WIND = 0x01;
+    const POWER_COAL = 0x02;
+
+    const BUILDING_BASE = 0x20;
+
+    const BUILDING_HOUSE_SMALL = 0x00;
+    const BUILDING_HOUSE_LARGE = 0x01;
+    const BUILDING_APARTMENT_SMALL = 0x02;
+    const BUILDING_APARTMENT_LARGE = 0x03;
+
+    const TRANSIT_BASE = 0x40;
+
+    const TRANSIT_BUS_STOP = 0x00;
+    
+    var types = {};
+    
+    types[POWER_BASE + POWER_SOLAR] = {
+      category: "power",
+      subtype: "solar"
+    };
+    types[POWER_BASE + POWER_WIND] = {
+      category: "power",
+      subtype: "wind"
+    };
+    types[POWER_BASE + POWER_COAL] = {
+      category: "power",
+      subtype: "coal"
+    };
+    
+    types[BUILDING_BASE + BUILDING_HOUSE_SMALL] = {
+      category: "building",
+      subtype: "house_small"
+    };
+    types[BUILDING_BASE + BUILDING_HOUSE_LARGE] = {
+      category: "building",
+      subtype: "house_large"
+    };
+    types[BUILDING_BASE + BUILDING_APARTMENT_SMALL] = {
+      category: "building",
+      subtype: "apt_small"
+    };
+    types[BUILDING_BASE + BUILDING_APARTMENT_SMALL] = {
+      category: "building",
+      subtype: "apt_large"
+    };
+    
+    types[TRANSIT_BASE + TRANSIT_BUS_STOP] = {
+      category: "transit",
+      subtype: "busStop"
+    };
+    
     var boardInitialized = false;
     var powerState = [];
     var buildingState = [];
@@ -185,13 +239,23 @@
     function handleOnSStateNotify(event) {
       //            console.log(event);
       var value = event.target.value;
-      console.log('Flags is ' + value.getUint8(0).toString(16));
-      console.log('UpdateNum is ' + value.getUint8(1).toString(16));
-      console.log('Type is ' + (value.getUint8(2) & 0B01111111).toString(16));
-      console.log('State is ' + Boolean(value.getUint8(2) & 0B10000000));
-      console.log('Id is ' + value.getUint8(3).toString(16));
-      console.log('Level is ' + value.getUint8(4).toString(16));
+      var flags = value.getUint8(0).toString(16)
+      var updateNum = value.getUint8(1).toString(16);
+      var rawType = value.getUint8(2) & 0B01111111).toString(16);
+      var state = Boolean(value.getUint8(2) & 0B10000000);
+      var id = value.getUint8(3).toString(16);
+      var level = value.getUint8(4).toString(16);
+      console.log('Flags is ' + flags);
+      console.log('UpdateNum is ' + updateNum);
+      console.log('Type is ' + rawType);
+      console.log('State is ' + state);
+      console.log('Id is ' + id);
+      console.log('Level is ' + level);
       console.log(buf2hex(value.buffer));
+      
+      var type = types[rawType];
+      
+      console.log(type);
     }
 
     function buf2hex(buffer) { // buffer is an ArrayBuffer
