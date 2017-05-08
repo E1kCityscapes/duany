@@ -119,10 +119,13 @@
           return characteristic.readValue();
         })
         .then(value => {
-          console.log('Number of Power Plant Pins: ' + value.getUint8(0));
-          console.log('Number of Building Pins: ' + value.getUint8(1));
-          console.log('Number of Transit Pins: ' + value.getUint8(2));
-          initializeBoardState(value.getUint8(0), value.getUint8(1), value.getUint8(02));
+          var numPower = value.getUint8(1);
+          var numBuilding = value.getUint8(2);
+          var numTransit = value.getUint8(3);
+          console.log('Number of Power Plant Pins: ' + numPower);
+          console.log('Number of Building Pins: ' + numBuilding);
+          console.log('Number of Transit Pins: ' + numTransit);
+          initializeBoardState(numPower, numBuilding, numTransit);
         })
         .catch(error => {
           console.log(error);
@@ -278,6 +281,7 @@
     }
 
     function handleBuildingUpdate(type, id, state) {
+      console.log(buildingState);
       buildingState[id].state = state;
       buildingState[id].subtype = type.subtype;
     }
